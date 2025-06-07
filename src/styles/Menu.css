@@ -1,0 +1,7 @@
+li {
+  @apply cursor-pointer flex items-center gap-4 w-full pl-8 py-3 border-r-4 border-transparent;
+}
+
+li:hover, li:active, li:focus {
+  @apply text-white border-r-4 border-emerald-500 bg-zinc-800;
+}
