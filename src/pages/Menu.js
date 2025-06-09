@@ -12,7 +12,8 @@ function Menu({isVisible, showNavBar}) {
     return (
         <nav
             className={`
-            ${isVisible ? 'flex' : 'hidden'}
+            ${isVisible ? 'flex absolute top-8 bottom-8' : 'hidden relative'}
+            nunito-sans
             bg-inkstone
             border-graphite
             rounded-lg
@@ -23,7 +24,6 @@ function Menu({isVisible, showNavBar}) {
             items-center
             w-full
             max-w-52
-            relative
             `}>
             <button
                 onClick={showNavBar}

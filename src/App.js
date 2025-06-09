@@ -18,7 +18,7 @@ function App() {
       <div
         className='
         bg-midnight text-white h-dvh
-        flex
+        flex gap-4
         py-8 px-4
         '>
         {
@@ -29,10 +29,10 @@ function App() {
                   sm:hidden
                   absolute 
                   z-10 top-0 left-0 translate-y-16
-                  h-12 w-12
+                  h-14 w-10
                   rounded-r-xl
                   bg-inkstone border-2 border-[#282828] border-l-0
-                  '><IoMenu className="text-xl ml-3 text-neutral-400" /></button>)
+                  '><IoMenu className="text-2xl ml-2 text-neutral-400" /></button>)
         }
 
         <Menu isVisible={isNavBar} showNavBar={showNavBar} />
