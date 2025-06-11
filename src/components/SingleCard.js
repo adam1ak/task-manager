@@ -1,4 +1,11 @@
-function SingleCard({task, onComplete ,onDelete}) {
+import { useTasks } from "../TaskContext";
+import { FaEdit, FaTrash } from "react-icons/fa";
+
+function SingleCard({ task }) {
+
+    const { toggleCompleted, changeModalFunction, deleteTask } = useTasks();
+
+
     return (
         <div className="
             flex flex-col flex-grow justify-between
@@ -9,21 +16,31 @@ function SingleCard({task, onComplete ,onDelete}) {
             border-2 border-[#3F3F3F]
             rounded-3xl
         ">
-            <div className="">
-                <p>{task.title}</p>
-                <p>{task.description}</p>
+            <div className="card-content">
+                <p className="card-title text-xl font-medium">{task.title}</p>
+                <p className="card-description text-wrap text-sm font-medium mt-0.5">{task.description}</p>
             </div>
-            <div className="">
-                <p>{task.date}</p>
-                <div className="flex justify-between">
-                    <button onClick={() => onComplete(task.id)} className={task.completed ? "cursor-default" : "cursor-pointer"}>{task.completed ? "Complete" : "Incomplete"}</button>
-                    <div className="flex gap-2">
-                        <button>edit</button>
-                        <button onClick={() => onDelete(task.id)}>delete</button>
+
+            <div className="card-footer">
+                <p className="card-date mb-2">{task.date}</p>
+                <div className="card-actions flex justify-between">
+                    <button
+                        onClick={() => toggleCompleted(task.id)}
+                        className={`
+                            ${task.completed ? "cursor-default bg-green-700" : "cursor-pointer bg-red-700"}
+                            rounded-full px-5 py-1.5
+                        `}>
+                        {task.completed ? "Complete" : "Incomplete"}
+                    </button>
+                    <div className="flex gap-5">
+                        <button onClick={() => changeModalFunction("edit")}><FaEdit className="text-2xl text-[#BABDCE]" /></button>
+                        <button onClick={() => deleteTask(task.id)}><FaTrash className="text-2xl text-[#BABDCE]" /></button>
                     </div>
                 </div>
             </div>
         </div>
     )
 }
+
+
 export default SingleCard;

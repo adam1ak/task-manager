@@ -2,13 +2,9 @@ import "../styles/Menu.css"
 import { NavLink } from "react-router-dom";
 import ProfilePicture from "../utils/pfp.jpg"
 import { FaArrowLeft, FaRightFromBracket, FaHouse, FaCheck, FaListCheck, FaStopwatch } from "react-icons/fa6";
-import { useEffect, useState } from "react";
 
 
 function Menu({isVisible, showNavBar}) {
-
-
-
     return (
         <nav
             className={`

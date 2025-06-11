@@ -1,57 +1,10 @@
 import { FaPlus } from "react-icons/fa";
 import SingleCard from "../components/SingleCard";
-import { useState } from "react";
+import { useTasks } from "../TaskContext";
 
 function TaskInput() {
-  const fakeTasks = [
-  {
-    id: 1,
-    title: "Complete project proposal",
-    description: "Write the final draft for client approval",
-    date: "2023-06-15",
-    completed: false
-  },
-  {
-    id: 2,
-    title: "Review UI designs",
-    description: "Provide feedback on the new dashboard mockups",
-    date: "2023-06-12",
-    completed: true
-  },
-  {
-    id: 3,
-    title: "Team meeting",
-    description: "Weekly sync with development team",
-    date: "2023-06-10",
-    completed: false
-  },
-  {
-    id: 4,
-    title: "Update documentation",
-    description: "Add new API endpoints to developer docs",
-    date: "2023-06-18",
-    completed: false
-  },
-  {
-    id: 5,
-    title: "Fix login bug",
-    description: "Investigate authentication timeout issue",
-    date: "2023-06-09",
-    completed: true
-  }
-];
-  const [tasks, setTasks] = useState(fakeTasks)
 
-
-  const handleDelete = (id) => {
-    setTasks(tasks.filter(task => task.id !== id))
-  }
-
-  const handleComplete = (id) =>{
-    setTasks(tasks.map(task => (
-      task.id === id ? {...task, completed : true} : task
-    )))
-  }
+  const { tasks, changeModalFunction } = useTasks();
 
   return (
     <div className="
@@ -73,8 +26,8 @@ function TaskInput() {
           text-[#6d6c73] text-xl 
           border-graphite rounded-full
           shadow-black shadow-lg
-        ">
-          <FaPlus />
+        " onClick={() => changeModalFunction('Add')}>
+          <FaPlus/>
         </button>
       </div>
 
@@ -98,7 +51,7 @@ function TaskInput() {
           </div>
           {
             tasks.map(task => (
-              <SingleCard key={task.id} task={task} onComplete={handleComplete} onDelete={handleDelete}/>
+              <SingleCard key={task.id} task={task}/>
             ))
           }
         </div>
