@@ -1,19 +1,41 @@
 import { useTasks } from "../TaskContext";
 import { useEffect, useState } from "react";
+import { useForm, Controller } from 'react-hook-form';
+import DatePicker from 'react-datepicker'
 import { FaEdit, FaPlus } from "react-icons/fa";
+import 'react-datepicker/dist/react-datepicker.css';
+import '../styles/DatePickerForm.css'
 
 function ModalContent({
     task,
     modalFunction }) {
 
-  const { changeModalFunction } = useTasks();
+    const { changeModalFunction, addTask, editTask } = useTasks();
 
-    const [completedTask, setCompletedTask] = useState(false);
-    const [importantTask, setImportantTask] = useState(false);
-    const [taskTitle, setTaskTitle] = useState("")
-    const [taskDescription, setTaskDescription] = useState("")
+    const defaultValues = {
+        id: Date.now(),
+        title: '',
+        description: '',
+        date: Date(),
+        important: false,
+        completed: false
+    }
 
-   const [mouseDownTarget, setMouseDownTarget] = useState(null);
+    const {
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        control,
+        formState: { errors, isValid }
+    } = useForm({
+        defaultValues,
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        criteriaMode: 'all'
+    });
+
+    const [mouseDownTarget, setMouseDownTarget] = useState(null);
 
     const handleMouseDown = (e) => {
         setMouseDownTarget(e.currentTarget);
@@ -26,22 +48,23 @@ function ModalContent({
         setMouseDownTarget(null);
     }
 
-    const handleCompletedChange = () => { setCompletedTask(prev => !prev) }
-    const handleImportantChange = () => { setImportantTask(prev => !prev) }
-
     useEffect(() => {
-        if (modalFunction === "edit" && task) {
-            setCompletedTask(task.completed || false);
-            setImportantTask(task.important || false);
-            setTaskTitle(task.title || "");
-            setTaskDescription(task.description || "");
+        if (modalFunction === "Edit" && task) {
+            reset(task)
         } else {
-            setCompletedTask(false);
-            setImportantTask(false);
-            setTaskTitle("");
-            setTaskDescription("");
+            reset(defaultValues)
         }
-    }, []);
+    }, [task, reset])
+
+    const onSubmit = (data) => {
+        if (modalFunction === "Edit") {
+            editTask(task.id, data)
+        } else {
+            addTask(data);
+        }
+        reset(defaultValues)
+        changeModalFunction(null)
+    }
 
     const stopPropagation = (e) => e.stopPropagation();
 
@@ -62,67 +85,110 @@ function ModalContent({
                 bg-[#212121] rounded-xl
                 flex flex-col
             "
-            onClick={(e) => stopPropagation(e)}
-            onMouseDown={(e) => {
-                stopPropagation(e);
-                setMouseDownTarget(null); 
-            }}>
+                onClick={(e) => stopPropagation(e)}
+                onMouseDown={(e) => {
+                    stopPropagation(e);
+                    setMouseDownTarget(null);
+                }}>
                 <div className="flex-container flex items-center justify-between mb-2">
                     <h2 className="text-2xl font-medium">{modalFunction} a Task</h2>
                     <p>x</p>
                 </div>
-                <InputField
-                    id={"titleInput"}
-                    label={"Title"}
-                    type={"text"}
-                    value={taskTitle}
-                    onChange={(e) => setTaskTitle(e.target.value)}
-                    placeholder={"e.g Go to the gym"} />
-                <InputField
-                    id={"descriptionInput"}
-                    label={"Description"}
-                    type={"textarea"}
-                    placeholder={"e.g Go to the gym"}
-                    styling={"h-[120px]"} />
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="flex flex-col">
 
-                <label htmlFor="dateInput" className="mb-2 text-lg">Date</label>
-                <p className="
-                                w-80
-                                p-3 mb-6
-                                bg-[#131313]
-                                text-gray-300
-                                rounded-lg
-                            ">
-                    dd/mm/yyyy
-                </p>
-                <CheckBox
-                    id="completedTask"
-                    label="Toggle Completed"
-                    checked={completedTask}
-                    handleChange={handleCompletedChange} />
-                <CheckBox
-                    id="importantTask"
-                    label="Toggle Important"
-                    checked={importantTask}
-                    handleChange={handleImportantChange} />
-                <button
-                    className="
-                        self-end
-                        flex items-center gap-3
-                        bg-blue-500
-                        py-2 px-6
-                        text-lg font-medium
-                        rounded-xl
-                    "
-                >
-                    {modalFunction === "Edit" ? <FaEdit /> : <FaPlus />}{modalFunction} Task
-                </button>
+                    <InputField
+                        id={"titleInput"}
+                        label={"Title"}
+                        type={"text"}
+                        placeholder={"e.g Go to the gym"}
+                        register={register("title", {
+                            required: "Title is required",
+                            minLength: {
+                                value: 3,
+                                message: "Tittle must be at least 3 characters"
+                            },
+                            maxLength: {
+                                value: 25,
+                                message: "Tittle cannot exceed 25 characters"
+                            },
+                            validate: (value) => value.trim() !== "" || "Title cannot be empty"
+                        })}
+                        error={errors.title}
+                        value={watch("title")} />
+                    <InputField
+                        id={"descriptionInput"}
+                        label={"Description"}
+                        type={"textarea"}
+                        placeholder={"e.g Go to the gym"}
+                        styling={"h-[120px]"}
+                        register={register("description", {
+                            maxLength: {
+                                value: 120,
+                                message: "Description cannot exceed 120 characters"
+                            },
+                        })}
+                        error={errors.description}
+                        value={watch("description")} />
+                    
+                    <label htmlFor="dateInput" className="mb-2 text-lg">Date</label>
+                    <div className="
+                                    w-80
+                                    p-3 mb-6
+                                    bg-[#131313]
+                                    text-gray-300
+                                    rounded-lg
+                                ">
+                        <Controller
+                            control={control}
+                            name='date'
+                            rules={{ required: "Task date is required" }}
+                            render={({ field }) => (
+                                <DatePicker
+                                    placeholderText="Select date"
+                                    onChange={(date) => field.onChange(date)}
+                                    className="custom-datepicker-input"
+                                    selected={field.value} 
+                                    minDate={new Date()}                             
+                                    dateFormat="yyyy/MM/dd"/>
+                            )}/>
+                        {errors.date && <p className="text-red-600 text-sm mb-4">{errors.date.message}</p>}
+                    </div>
+                    <CheckBox
+                        id="completedTask"
+                        label="Toggle Completed"
+                        register={register("completed")}
+                        checked={watch("completed")} />
+                    <CheckBox
+                        id="importantTask"
+                        label="Toggle Important"
+                        register={register("important")}
+                        checked={watch("important")} />
+                    <button
+                        type="submit"
+                        className="
+                            self-end
+                            flex items-center gap-3
+                            bg-blue-500
+                            py-2 px-6
+                            text-lg font-medium
+                            rounded-xl
+                            disabled:bg-blue-500/40
+                        "
+                        disabled={!isValid }
+                    >
+                        {modalFunction === "Edit" ? <FaEdit /> : <FaPlus />}{modalFunction} Task
+                    </button>
+
+                </form>
             </div>
         </div>
     )
 }
 
-function InputField({ id, type, value, onChange, label, placeholder, styling }) {
+
+function InputField({ id, type, register, label, placeholder, styling, error, value }) {
 
     const components = {
         textarea: 'textarea',
@@ -130,16 +196,28 @@ function InputField({ id, type, value, onChange, label, placeholder, styling }) 
     }
 
     const Tag = components[type] || 'input';
-
+    const maxLength = type === "textarea" ? "125" : "30";
+    
     return (
         <>
             <label htmlFor={id} className="mb-2 text-lg">{label}</label>
+            {value?.length >= maxLength * 0.35  && (
+                <span className={`
+                    text-xs 
+                    mb-1
+                    ${value?.length >= maxLength ? 'text-red-600' : 
+                    value?.length > maxLength * 0.65  ? 'text-yellow-500' : 
+                    'text-gray-400'}
+                    transition-all ease-in delay-75
+                `}>
+                    {value.length}/{maxLength}
+                </span>
+                )
+            }
             <Tag
-                id={id}
-                value={value}
-                onChange={onChange}
+                {...register}
                 placeholder={placeholder}
-                maxLength={type === "textarea" ? "120" : "25"}
+                maxLength={maxLength}
                 className={`
                             ${styling}
                             w-80
@@ -148,16 +226,17 @@ function InputField({ id, type, value, onChange, label, placeholder, styling }) 
                             placeholder-gray-300
                             rounded-lg
                             resize-none outline-none
-                            border-2 border-transparent
+                            border-2 ${error ? "border-600" : "border-transparent"}
                             overflow-hidden
                             focus:shadow-xl
                             transition-all ease-in
                         `} />
+            {error && <p className="text-red-600 textt-sm mb-4">{error.message}</p>}
         </>
     )
 }
 
-function CheckBox({ id, label, checked, handleChange }) {
+function CheckBox({ id, label, register, checked }) {
     return (
         <span
             className="
@@ -171,12 +250,12 @@ function CheckBox({ id, label, checked, handleChange }) {
                 <input
                     type="checkbox"
                     id={id}
+                    {...register}
                     checked={checked}
-                    onChange={() => handleChange()}
                     className="absolute opacity-0 h-0 w-0 peer"
                 />
-                <span
-                    onClick={() => handleChange()}
+                <label
+                    htmlFor={id}
                     className="
                     relative
                     block
@@ -196,6 +275,7 @@ function CheckBox({ id, label, checked, handleChange }) {
                     after:w-2 after:h-2
                     after:bg-green-600
                     after:rounded-sm
+                    cursor-pointer
                 "/>
             </div>
         </span>

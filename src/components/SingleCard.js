@@ -3,8 +3,13 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 
 function SingleCard({ task }) {
 
-    const { toggleCompleted, changeModalFunction, deleteTask } = useTasks();
+    const { toggleCompleted, changeModalFunction, assingCurrentTask, deleteTask } = useTasks();
 
+    const formattedDate = task.date ? new Date(task.date).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric'
+    }) : 'No date';
 
     return (
         <div className="
@@ -22,18 +27,20 @@ function SingleCard({ task }) {
             </div>
 
             <div className="card-footer">
-                <p className="card-date mb-2">{task.date}</p>
+                <p className="card-date mb-2">{formattedDate}</p>
                 <div className="card-actions flex justify-between">
                     <button
                         onClick={() => toggleCompleted(task.id)}
                         className={`
                             ${task.completed ? "cursor-default bg-green-700" : "cursor-pointer bg-red-700"}
                             rounded-full px-5 py-1.5
-                        `}>
+                        `}
+                        disabled={task.completed}
+                        >
                         {task.completed ? "Complete" : "Incomplete"}
                     </button>
                     <div className="flex gap-5">
-                        <button onClick={() => changeModalFunction("edit")}><FaEdit className="text-2xl text-[#BABDCE]" /></button>
+                        <button onClick={() => {changeModalFunction("Edit"); assingCurrentTask(task)}}><FaEdit className="text-2xl text-[#BABDCE]" /></button>
                         <button onClick={() => deleteTask(task.id)}><FaTrash className="text-2xl text-[#BABDCE]" /></button>
                     </div>
                 </div>

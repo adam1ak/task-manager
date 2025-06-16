@@ -1,5 +1,9 @@
-li {
-  @apply cursor-pointer flex items-center gap-4 w-full pl-8 py-3 border-r-4 border-transparent;
+a{
+  @apply w-full cursor-pointer 
+}
+
+li{
+  @apply flex pl-8 py-3 gap-4 border-r-4 border-transparent
 }
 
 li:hover, li:active, li:focus {

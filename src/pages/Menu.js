@@ -40,10 +40,10 @@ function Menu({isVisible, showNavBar}) {
                 <h1>Maclinz<br />Maclinz</h1>
             </div>
             <ul className="flex flex-col w-full mt-2">
-                <li><FaHouse className="text-xl" />All Tasks</li>
-                <li><FaListCheck className="text-xl" />Important</li>
-                <li><FaCheck className="text-xl" />Completed</li>
-                <li><FaStopwatch className="text-xl" />Do It Now</li>
+                <NavLink to="/"><li><FaHouse className="text-xl"/>All Tasks</li></NavLink>
+                <NavLink to="/important-tasks"><li><FaListCheck className="text-xl"/>Important</li></NavLink>
+                <NavLink to="/completed-tasks"><li><FaCheck className="text-xl" />Completed</li></NavLink>
+                <NavLink to="/asap-tasks"><li><FaStopwatch className="text-xl" />Do It Now</li></NavLink>
             </ul>
             <button className="flex items-center pl-8 self-start text-lg gap-4">
                 <FaRightFromBracket className="text-xl" />Sign out

@@ -1,12 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import TaskInput from "./pages/TaskInput";
-import Menu from "./pages/Menu";
 import { useTasks } from "./TaskContext";
 import { IoMenu } from "react-icons/io5";
+import TaskInput from "./pages/CreateTasks";
+import ImportantTasks from "./pages/ImportantTasks";
+import CompletedTasks from "./pages/CompletedTasks";
 import ModalContent from "./components/ModalContent";
+import Menu from "./pages/Menu";
+import AsapTasks from "./pages/AsapTasks";
+
 
 function AppContent({ isNavBar, showNavBar }) {
-  const { modalFunction } = useTasks(); 
+  const { modalFunction, currentTask } = useTasks(); 
 
   return (
     <Router>
@@ -16,7 +20,7 @@ function AppContent({ isNavBar, showNavBar }) {
         py-8 px-4
         '>
         {modalFunction !== null && (
-            <ModalContent modalFunction={modalFunction}/>
+            <ModalContent modalFunction={modalFunction} task={currentTask}/>
         )}
         {!isNavBar && (
             <button
@@ -35,6 +39,9 @@ function AppContent({ isNavBar, showNavBar }) {
         <Menu isVisible={isNavBar} showNavBar={showNavBar} />
         <Routes>
             <Route path="/" element={<TaskInput />} />
+            <Route path="/important-tasks" element={<ImportantTasks/>}/>
+            <Route path="/completed-tasks" element={<CompletedTasks/>}/>
+            <Route path="/asap-tasks" element={<AsapTasks/>}/>
         </Routes>
         </div>
     </Router>

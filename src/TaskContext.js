@@ -52,6 +52,7 @@ export function TaskProvider({ children }) {
   });
 
   const [modalFunction, setModalFunction] = useState(null);
+  const [currentTask, setCurrentTask] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -61,9 +62,23 @@ export function TaskProvider({ children }) {
     setModalFunction(value)
   }
 
+  const assingCurrentTask = (data) => {
+    setCurrentTask(data)
+  }
+
   const addTask = (newTask) => {
     setTasks([...tasks, { ...newTask, id: Date.now() }]);
   };
+
+  const editTask = (id, editedTask) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? {
+        ...task,
+        ...(editedTask || {}),
+        id: task.id
+      } : task
+    ))
+  }
 
   const toggleCompleted = (id) => {
     setTasks(tasks.map(task => 
@@ -76,7 +91,11 @@ export function TaskProvider({ children }) {
   };
 
   return (
-    <TaskContext.Provider value={{ tasks, modalFunction, changeModalFunction, addTask, toggleCompleted, deleteTask }}>
+    <TaskContext.Provider value={{ 
+      tasks, modalFunction, currentTask,
+      changeModalFunction, addTask, 
+      toggleCompleted, deleteTask,
+      editTask, assingCurrentTask }}>
       {children}
     </TaskContext.Provider>
   );
