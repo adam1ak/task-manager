@@ -1,3 +1,4 @@
+import { BrowserRouter as Router} from "react-router-dom";
 import { useState } from "react";
 import { TaskProvider } from "./TaskContext";
 import AppContent from "./AppContent";
@@ -11,7 +12,9 @@ function App() {
 
   return (
     <TaskProvider>
-      <AppContent isNavBar={isNavBar} showNavBar={showNavBar} />
+      <Router>
+        <AppContent isNavBar={isNavBar} showNavBar={showNavBar} />
+      </Router>
     </TaskProvider>
   );
 }

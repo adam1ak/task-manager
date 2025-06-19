@@ -18,6 +18,13 @@
     background-color: #0F0F0F;
 }
 
+.auth_form-overlay {
+  background-color: #181818;
+  box-shadow: 
+    0 0 0 1px #282828, /* crisp border */
+    0 12px 40px rgba(0, 0, 0, 0.7); /* deep shadow */
+}
+
 .bg-inkstone {
     background-color: #181818;
 }
@@ -33,4 +40,17 @@
   font-variation-settings:
     "wdth" 100,
     "YTLC" 500;
+}
+
+.input-shape{
+  border: 1px solid #383838;
+  background: #1F1F1F;
+  border-radius: 6px;
+  outline: none;
+  padding: 0.375rem 0.75rem;  
+  transition: border 0.2s;
+}
+
+.input-shape:active, .input-shape:focus{
+  border: 1px solid #747474;
 }

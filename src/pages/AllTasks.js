@@ -2,7 +2,7 @@ import { FaPlus } from "react-icons/fa";
 import SingleCard from "../components/SingleCard";
 import { useTasks } from "../TaskContext";
 
-function TaskInput() {
+function AllTasks() {
 
   const { tasks, changeModalFunction, assingCurrentTask } = useTasks();
 
@@ -62,4 +62,4 @@ function TaskInput() {
   );
 }
 
-export default TaskInput;
+export default AllTasks;
