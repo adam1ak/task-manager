@@ -1,21 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form';
 
-import { auth } from "../firebaseConfing"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { db } from "../firebaseConfig"
+import { setDoc, doc } from "firebase/firestore";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
+import { useNavigate } from "react-router-dom";
 
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Don't forget this line!
+import { PropagateLoader } from 'react-spinners';
+import 'react-toastify/dist/ReactToastify.css';
 import '../styles/Toast.css'
+
 
 function AuthForm() {
 
     const [isRegister, setIsRegister] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
-    const [authPopup, setAuthPopup] = useState('')
+    const [showAuth, setShowAuth] = useState(false);
+
+    const auth = getAuth();
+
+    const navigate = useNavigate();
 
     const authQuotes = {
         register: {
@@ -55,44 +62,89 @@ function AuthForm() {
         criteriaMode: 'all'
     });
 
+    useEffect(() => {
+        let timer;
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                timer = setTimeout(() => {
+                    navigate("/all-tasks", { replace: true })
+                }, 500)
+            } else {
+                setShowAuth(true)
+            }
+        });
+
+        return () => {
+            unsubscribe();
+            clearTimeout(timer);
+        };
+
+    }, [navigate, auth]);
+
+    const addUserToDb = async (name, email, uid) => {
+        try {
+            await setDoc(doc(db, "users", uid), {
+                userName: name,
+                userEmail: email,
+                uid: uid
+            });
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
+    }
+
     const onSubmit = async (data) => {
         try {
             if (isRegister) {
-                await createUserWithEmailAndPassword(auth, data.email, data.password);
+                const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+                const user = userCredential.user;
+                addUserToDb(data.name, data.email, user.uid)
+
                 toast.success('Registration successful!');
+                navigate("/all-tasks")
             } else {
                 await signInWithEmailAndPassword(auth, data.email, data.password);
+
                 toast.success('Login successful!');
+                navigate("/all-tasks")
             }
             reset(defaultValues);
-        } catch (error) {
-            let errorMessage = '';
-            switch (error.code) {
-                case 'auth/email-already-in-use':
-                    errorMessage = 'Email already in use';
-                    break;
-                case 'auth/invalid-email':
-                    errorMessage = 'Invalid email address';
-                    break;
-                case 'auth/invalid-credential':
-                    errorMessage = "Invalid password";
-                    break;
-                case 'auth/weak-password':
-                    errorMessage = 'Password should be at least 6 characters';
-                    break;
-                case 'auth/too-many-requests':
-                    errorMessage = "Slow down"
-                    break;
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    errorMessage = 'Invalid email or password';
-                    break;
-                default:
-                    errorMessage = error.message;
-            }
+        }
+        catch (error) {
+            const errorMap = {
+                'auth/email-already-in-use': 'Email already in use',
+                'auth/invalid-email': 'Invalid email address',
+                'auth/invalid-credential': 'Invalid password',
+                'auth/weak-password': 'Password should be at least 6 characters',
+                'auth/too-many-requests': 'Slow down',
+                'auth/user-not-found': 'Invalid email or password',
+                'auth/wrong-password': 'Invalid email or password',
+                'auth/operation-not-allowed': 'This operation is not allowed', // new
+                'auth/account-exists-with-different-credential': 'Account exists with different credential', // new
+                'auth/requires-recent-login': 'Please login again to perform this action', // new
+                'auth/user-disabled': 'This account has been disabled', // new
+                'auth/network-request-failed': 'Network error, please try again', // new
+                'auth/provider-already-linked': 'This provider is already linked', // new
+                'auth/credential-already-in-use': 'This credential is already in use' // new
+            };
+            const errorMessage = errorMap[error.code] || error.message;
             toast.error(errorMessage);
         }
     };
+
+    if (!showAuth) {
+        return (
+            <div className="flex items-center justify-center w-full h-full">
+                <div className="text-center">
+                    <PropagateLoader
+                        color="#16A34A"
+                        loading
+                        size={25}
+                    />
+                </div>
+            </div>
+        )
+    }
 
     return (
 

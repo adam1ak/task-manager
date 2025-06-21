@@ -1,10 +1,29 @@
 import "../styles/Menu.css"
 import { NavLink } from "react-router-dom";
 import ProfilePicture from "../utils/pfp.jpg"
+
 import { FaArrowLeft, FaRightFromBracket, FaHouse, FaCheck, FaListCheck, FaStopwatch } from "react-icons/fa6";
+import { getAuth, signOut } from "firebase/auth";
+import { ToastContainer, toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
 
 
-function Menu({isVisible, showNavBar}) {
+function Menu({ isVisible, showNavBar }) {
+
+
+    const auth = getAuth();
+    const navigate = useNavigate();
+
+    const handleSignOut = () => {
+        signOut(auth).then(() => {
+            console.log("xddd")
+            toast.success("Logged out")
+            navigate("/auth-form", { replace: true })
+        }).catch((error) => {
+            console.log(error, 'signOut error')
+        });
+    }
+
     return (
         <nav
             className={`
@@ -21,6 +40,18 @@ function Menu({isVisible, showNavBar}) {
             w-full
             max-w-52
             `}>
+            <ToastContainer
+                position="top-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                limit={1}
+            />
             <button
                 onClick={showNavBar}
                 className="
@@ -40,12 +71,14 @@ function Menu({isVisible, showNavBar}) {
                 <h1>Maclinz<br />Maclinz</h1>
             </div>
             <ul className="flex flex-col w-full mt-2">
-                <NavLink to="/all-tasks"><li><FaHouse className="text-xl"/>All Tasks</li></NavLink>
-                <NavLink to="/important-tasks"><li><FaListCheck className="text-xl"/>Important</li></NavLink>
+                <NavLink to="/all-tasks"><li><FaHouse className="text-xl" />All Tasks</li></NavLink>
+                <NavLink to="/important-tasks"><li><FaListCheck className="text-xl" />Important</li></NavLink>
                 <NavLink to="/completed-tasks"><li><FaCheck className="text-xl" />Completed</li></NavLink>
                 <NavLink to="/asap-tasks"><li><FaStopwatch className="text-xl" />Do It Now</li></NavLink>
             </ul>
-            <button className="flex items-center pl-8 self-start text-lg gap-4">
+            <button
+                className="flex items-center pl-8 py-3 w-full self-start text-lg gap-4"
+                onClick={handleSignOut}>
                 <FaRightFromBracket className="text-xl" />Sign out
             </button>
         </nav>
