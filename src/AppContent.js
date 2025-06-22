@@ -38,8 +38,6 @@ function AppContent({ isNavBar, showNavBar }) {
                 }
             });
 
-            console.log(showContet)
-
             return () => {
                 unsubscribe();
                 clearTimeout(timer);

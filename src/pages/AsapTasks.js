@@ -9,14 +9,14 @@ function AsapTasks() {
     const dateDiffrence = (targetDate) => {
         const today = new Date();
         const target = new Date(targetDate);
-        
+
         const diffInMs = target - today;
 
         const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
         return diffInDays;
     }
 
-    const asapTasks = tasks.filter((task) => dateDiffrence(task.date) <= 3 && dateDiffrence(task.date) !== -1);
+    const asapTasks = tasks.filter((task) => dateDiffrence(task.timestamp) <= 3 && dateDiffrence(task.timestamp) !== -1);
 
     return (
         <div className="
@@ -47,9 +47,23 @@ function AsapTasks() {
             <div className="cards-conatiner w-full mt-8 overflow-auto scrollbar-hide">
                 {/* Flex aligment */}
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 mb-2">
+                    <div className="
+                        min-w-64 max-w-80 h-64 
+                        flex items-center flex-grow justify-center gap-2
+                        text-lg font-medium
+                        bg-inkstone
+                        border-2 border-[#282828] rounded-3xl border-dashed
+                        cursor-pointer
+                        hover:bg-[#2C2D33] hover:border-0
+                        transition-all duration-300
+                        "
+                        onClick={() => { changeModalFunction('Add'); assingCurrentTask(null) }}>
+                        <FaPlus />
+                        <p>Add New Task</p>
+                    </div>
                     {
                         asapTasks.map(task => (
-                        <SingleCard key={task.id} task={task}/>
+                            <SingleCard key={task.id} task={task} />
                         ))
                     }
                 </div>

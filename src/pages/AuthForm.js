@@ -7,6 +7,8 @@ import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWith
 
 import { useNavigate } from "react-router-dom";
 
+import { useTasks } from "../TaskContext";
+
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import { PropagateLoader } from 'react-spinners';
@@ -15,6 +17,8 @@ import '../styles/Toast.css'
 
 
 function AuthForm() {
+
+    const { handleSetUserInfo } = useTasks();
 
     const [isRegister, setIsRegister] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
@@ -94,16 +98,24 @@ function AuthForm() {
     }
 
     const onSubmit = async (data) => {
+        const { password, ...dataWithoutPassword } = data
         try {
             if (isRegister) {
-                const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+                const userCredential = await createUserWithEmailAndPassword(auth, data.email, password);
                 const user = userCredential.user;
                 addUserToDb(data.name, data.email, user.uid)
+
+                let userInfoData = {
+                    ...dataWithoutPassword,
+                    uid: user.uid
+                }
+
+                handleSetUserInfo(userInfoData)
 
                 toast.success('Registration successful!');
                 navigate("/all-tasks")
             } else {
-                await signInWithEmailAndPassword(auth, data.email, data.password);
+                await signInWithEmailAndPassword(auth, data.email, password);
 
                 toast.success('Login successful!');
                 navigate("/all-tasks")

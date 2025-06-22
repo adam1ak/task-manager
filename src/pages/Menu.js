@@ -2,14 +2,18 @@ import "../styles/Menu.css"
 import { NavLink } from "react-router-dom";
 import ProfilePicture from "../utils/pfp.jpg"
 
+import { useTasks } from "../TaskContext";
+
 import { FaArrowLeft, FaRightFromBracket, FaHouse, FaCheck, FaListCheck, FaStopwatch } from "react-icons/fa6";
 import { getAuth, signOut } from "firebase/auth";
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 
 function Menu({ isVisible, showNavBar }) {
 
+    const { userInfo } = useTasks();
 
     const auth = getAuth();
     const navigate = useNavigate();
@@ -68,7 +72,7 @@ function Menu({ isVisible, showNavBar }) {
                     className="max-w-16 rounded-full"
                     src={ProfilePicture}
                     alt="Person avatar" />
-                <h1>Maclinz<br />Maclinz</h1>
+                <h1>{userInfo ? userInfo.name : ""}</h1>
             </div>
             <ul className="flex flex-col w-full mt-2">
                 <NavLink to="/all-tasks"><li><FaHouse className="text-xl" />All Tasks</li></NavLink>

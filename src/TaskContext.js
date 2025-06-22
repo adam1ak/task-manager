@@ -1,54 +1,38 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { db } from "./firebaseConfig"
+import { setDoc, doc, collection, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
 
 const TaskContext = createContext();
 
-  const initialTasks = [
-  {
-    id: 1,
-    title: "Complete project proposal",
-    description: "Write the final draft for client approval",
-    date: "2023-06-15",
-    important: false,
-    completed: false
-  },
-  {
-    id: 2,
-    title: "Review UI designs",
-    description: "Provide feedback on the new dashboard mockups",
-    date: "2023-06-12",
-    important: true,
-    completed: true
-  },
-  {
-    id: 3,
-    title: "Team meeting",
-    description: "Weekly sync with development team",
-    date: "2023-06-10",
-    important: false,
-    completed: false
-  },
-  {
-    id: 4,
-    title: "Update documentation",
-    description: "Add new API endpoints to developer docs",
-    date: "2023-06-18",
-    important: false,
-    completed: false
-  },
-  {
-    id: 5,
-    title: "Fix login bug",
-    description: "Investigate authentication timeout issue",
-    date: "2023-06-09",
-    important: false,
-    completed: true
-  }
-];
 
 export function TaskProvider({ children }) {
+
+  const auth = getAuth();
+  const user = auth.currentUser;
+
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem('tasks');
-    return saved ? JSON.parse(saved) : initialTasks;
+    try {
+      const saved = localStorage.getItem('tasks');
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.log("Failed to parse tasks from localStorage", error);
+      return [];
+    }
+  });
+
+
+  // jezeli userInfo puste
+  // spróbuj pobrac z firebase
+  const [userInfo, setUserInfo] = useState(() => {
+    try {
+      const saved = localStorage.getItem('userInfo');
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      console.error("Failed to parse user info from localStorage", error);
+      return null;
+    }
   });
 
   const [modalFunction, setModalFunction] = useState(null);
@@ -58,6 +42,15 @@ export function TaskProvider({ children }) {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  const handleSetUserInfo = (data) => {
+    try {
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setUserInfo(data)
+    } catch (error) {
+      console.error("Failed to save userInfo", error)
+    }
+  }
+
   const changeModalFunction = (value) => {
     setModalFunction(value)
   }
@@ -66,8 +59,20 @@ export function TaskProvider({ children }) {
     setCurrentTask(data)
   }
 
-  const addTask = (newTask) => {
+  const addTask = async (newTask) => {
     setTasks([...tasks, { ...newTask, id: Date.now() }]);
+    try {
+      const docId = `${Date.now()}-${user.uid}`;
+      const docRef = doc(db, "tasks", docId);
+
+      await setDoc(docRef, {
+        ...newTask
+      })
+      console.log("Document wrriten to database")
+
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
   };
 
   const editTask = (id, editedTask) => {
@@ -81,7 +86,7 @@ export function TaskProvider({ children }) {
   }
 
   const toggleCompleted = (id) => {
-    setTasks(tasks.map(task => 
+    setTasks(tasks.map(task =>
       task.id === id ? { ...task, completed: !task.completed } : task
     ));
   };
@@ -91,11 +96,12 @@ export function TaskProvider({ children }) {
   };
 
   return (
-    <TaskContext.Provider value={{ 
-      tasks, modalFunction, currentTask,
-      changeModalFunction, addTask, 
+    <TaskContext.Provider value={{
+      tasks, modalFunction, currentTask, userInfo,
+      changeModalFunction, addTask, handleSetUserInfo,
       toggleCompleted, deleteTask,
-      editTask, assingCurrentTask }}>
+      editTask, assingCurrentTask
+    }}>
       {children}
     </TaskContext.Provider>
   );

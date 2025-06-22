@@ -17,6 +17,7 @@ function ModalContent({
         title: '',
         description: '',
         date: Date(),
+        timestamp: 0,
         important: false,
         completed: false
     }
@@ -57,13 +58,32 @@ function ModalContent({
     }, [task, reset])
 
     const onSubmit = (data) => {
-        if (modalFunction === "Edit") {
-            editTask(task.id, data)
-        } else {
-            addTask(data);
+        try{
+            const dateObject = new Date(data.date);
+
+            if(isNaN(dateObject.getTime())){
+                throw new Error(`Invalid date format: ${data.date}`)
+            }
+
+            const taskData = {
+                ...data,
+                date: dateObject.toLocaleDateString(),
+                timestamp: dateObject.getTime(),
+                id: modalFunction === "Edit" ? task.id : Date.now()
+            }
+
+            if(modalFunction === "Edit"){
+                editTask(task.id, taskData)
+            } else {
+                addTask(taskData)
+            }
+
+            reset(defaultValues)
+            changeModalFunction(null)
+
+        } catch (error) {
+            console.log("Failed to add new task", error)
         }
-        reset(defaultValues)
-        changeModalFunction(null)
     }
 
     const stopPropagation = (e) => e.stopPropagation();
@@ -131,7 +151,7 @@ function ModalContent({
                         })}
                         error={errors.description}
                         value={watch("description")} />
-                    
+
                     <label htmlFor="dateInput" className="mb-2 text-lg">Date</label>
                     <div className="
                                     w-80
@@ -149,10 +169,10 @@ function ModalContent({
                                     placeholderText="Select date"
                                     onChange={(date) => field.onChange(date)}
                                     className="custom-datepicker-input"
-                                    selected={field.value} 
-                                    minDate={new Date()}                             
-                                    dateFormat="yyyy/MM/dd"/>
-                            )}/>
+                                    selected={field.value}
+                                    minDate={new Date()}
+                                    dateFormat="yyyy/MM/dd" />
+                            )} />
                         {errors.date && <p className="text-red-600 text-sm mb-4">{errors.date.message}</p>}
                     </div>
                     <CheckBox
@@ -176,7 +196,7 @@ function ModalContent({
                             rounded-xl
                             disabled:bg-blue-500/40
                         "
-                        disabled={!isValid }
+                        disabled={!isValid}
                     >
                         {modalFunction === "Edit" ? <FaEdit /> : <FaPlus />}{modalFunction} Task
                     </button>
@@ -197,22 +217,22 @@ function InputField({ id, type, register, label, placeholder, styling, error, va
 
     const Tag = components[type] || 'input';
     const maxLength = type === "textarea" ? "125" : "30";
-    
+
     return (
         <>
             <label htmlFor={id} className="mb-2 text-lg">{label}</label>
-            {value?.length >= maxLength * 0.35  && (
+            {value?.length >= maxLength * 0.35 && (
                 <span className={`
                     text-xs 
                     mb-1
-                    ${value?.length >= maxLength ? 'text-red-600' : 
-                    value?.length > maxLength * 0.65  ? 'text-yellow-500' : 
-                    'text-gray-400'}
+                    ${value?.length >= maxLength ? 'text-red-600' :
+                        value?.length > maxLength * 0.65 ? 'text-yellow-500' :
+                            'text-gray-400'}
                     transition-all ease-in delay-75
                 `}>
                     {value.length}/{maxLength}
                 </span>
-                )
+            )
             }
             <Tag
                 {...register}

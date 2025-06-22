@@ -5,11 +5,6 @@ function SingleCard({ task }) {
 
     const { toggleCompleted, changeModalFunction, assingCurrentTask, deleteTask } = useTasks();
 
-    const formattedDate = task.date ? new Date(task.date).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric'
-    }) : 'No date';
 
     return (
         <div className="
@@ -27,7 +22,7 @@ function SingleCard({ task }) {
             </div>
 
             <div className="card-footer">
-                <p className="card-date mb-2">{formattedDate}</p>
+                <p className="card-date mb-2">{task.date}</p>
                 <div className="card-actions flex justify-between">
                     <button
                         onClick={() => toggleCompleted(task.id)}
