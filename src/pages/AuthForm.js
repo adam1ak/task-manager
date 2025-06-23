@@ -49,7 +49,7 @@ function AuthForm() {
         isRegister ? authQuotes.register : authQuotes.login;
 
     const defaultValues = {
-        name: '',
+        userName: '',
         email: '',
         password: ''
     };
@@ -103,7 +103,7 @@ function AuthForm() {
             if (isRegister) {
                 const userCredential = await createUserWithEmailAndPassword(auth, data.email, password);
                 const user = userCredential.user;
-                addUserToDb(data.name, data.email, user.uid)
+                addUserToDb(data.userName, data.email, user.uid)
 
                 let userInfoData = {
                     ...dataWithoutPassword,
@@ -197,7 +197,7 @@ function AuthForm() {
                                 type="text"
                                 placeholder="John"
                                 className="input-shape"
-                                {...register("name", {
+                                {...register("userName", {
                                     required: "Name is required",
                                     minLength: {
                                         value: 3,
@@ -213,7 +213,7 @@ function AuthForm() {
                                     },
                                     validate: (value) => value.trim() !== "" || "Name cannot be empty"
                                 })} />
-                            {errors.name && <p className="text-red-600 ml-2 -mt-4 text-sm">{errors.name.message}</p>}
+                            {errors.userName && <p className="text-red-600 ml-2 -mt-4 text-sm">{errors.userName.message}</p>}
                         </>
                     )}
                     <input

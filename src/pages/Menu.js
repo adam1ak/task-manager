@@ -72,7 +72,7 @@ function Menu({ isVisible, showNavBar }) {
                     className="max-w-16 rounded-full"
                     src={ProfilePicture}
                     alt="Person avatar" />
-                <h1>{userInfo ? userInfo.name : ""}</h1>
+                <h1>{userInfo ? userInfo.userName : ""}</h1>
             </div>
             <ul className="flex flex-col w-full mt-2">
                 <NavLink to="/all-tasks"><li><FaHouse className="text-xl" />All Tasks</li></NavLink>
