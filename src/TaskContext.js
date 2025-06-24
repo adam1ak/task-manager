@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db } from "./firebaseConfig"
-import { doc, onSnapshot, collection, deleteDoc, addDoc, query, orderBy, where, getDocs } from "firebase/firestore";
+import { doc, onSnapshot, collection, deleteDoc, addDoc, query, orderBy, where, getDocs, updateDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { PropagateLoader } from 'react-spinners';
 
@@ -127,20 +127,63 @@ export function TaskProvider({ children }) {
     }
   };
 
-  const editTask = (id, editedTask) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? {
-        ...task,
-        ...(editedTask || {}),
-        id: task.id
-      } : task
-    ))
+  const editTask = async (id, editedTask) => {
+    // setTasks(tasks.map(task =>
+    //   task.id === id ? {
+    //     ...task,
+    //     ...(editedTask || {}),
+    //     id: task.id
+    //   } : task
+    // ))
+    try {
+
+      const taskRef = collection(db, "users", currentUser.uid, "tasks");
+      const q = query(taskRef, where("id", "==", id));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+        return;
+      }
+      
+      querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref, {
+          ...doc.data(),
+          ...(editedTask || {}),
+          id: doc.data().id
+        })
+      })
+
+      console.log("Succed to edit task values")
+
+    } catch (error) {
+      console.error("Failed to edit task values", error)
+    }
   }
 
-  const toggleCompleted = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  const toggleCompleted = async (id) => {
+    try {
+
+      const taskRef = collection(db, "users", currentUser.uid, "tasks");
+      const q = query(taskRef, where("id", "==", id));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+        return;
+      }
+      
+      querySnapshot.forEach((doc) => {
+        updateDoc(doc.ref, {
+          completed: true
+        })
+      })
+
+      console.log("Succed to toggle completed")
+
+    } catch (error) {
+      console.error("Failed to toggle completed", error)
+    }
   };
 
   const deleteTask = async (id) => {
@@ -159,7 +202,7 @@ export function TaskProvider({ children }) {
       console.error("Error during deleting task", error)
     }
   };
-  
+
   if (loadingAuth) {
     return (
       <div className="flex bg-yellow-300 items-center justify-center w-full h-full">

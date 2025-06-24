@@ -7,16 +7,12 @@ function AsapTasks() {
     const { tasks, changeModalFunction, assingCurrentTask } = useTasks();
 
     const dateDiffrence = (targetDate) => {
-        const today = new Date();
-        const target = new Date(targetDate);
-
-        const diffInMs = target - today;
-
-        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-        return diffInDays;
+        const now = Date.now();
+        const daysDiffrence = Math.ceil((targetDate - now) / 86400000);
+        return daysDiffrence;
     }
 
-    const asapTasks = tasks.filter((task) => dateDiffrence(task.timestamp) <= 3 && dateDiffrence(task.timestamp) !== -1);
+    const asapTasks = tasks.filter((task) => dateDiffrence(task.timestamp) <= 3 && dateDiffrence(task.timestamp)  !== -1);
 
     return (
         <div className="

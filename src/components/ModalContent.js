@@ -13,10 +13,10 @@ function ModalContent({
     const { changeModalFunction, addTask, editTask } = useTasks();
 
     const defaultValues = {
-        id: Date.now(),
+        id: 0,
         title: '',
         description: '',
-        date: Date(),
+        date: null,
         timestamp: 0,
         important: false,
         completed: false
@@ -51,17 +51,26 @@ function ModalContent({
 
     useEffect(() => {
         if (modalFunction === "Edit" && task) {
-            reset(task)
+            const dateStr = task.date;
+            const [day, month, year] = dateStr.split('.');
+            const date = new Date(`${year}-${month}-${day}`);
+
+            const formatedDate = {
+                ...task,
+                date: date
+            }
+            reset(formatedDate)
+
         } else {
             reset(defaultValues)
         }
     }, [task, reset])
 
     const onSubmit = (data) => {
-        try{
+        try {
             const dateObject = new Date(data.date);
 
-            if(isNaN(dateObject.getTime())){
+            if (isNaN(dateObject.getTime())) {
                 throw new Error(`Invalid date format: ${data.date}`)
             }
 
@@ -72,7 +81,7 @@ function ModalContent({
                 id: modalFunction === "Edit" ? task.id : Date.now()
             }
 
-            if(modalFunction === "Edit"){
+            if (modalFunction === "Edit") {
                 editTask(task.id, taskData)
             } else {
                 addTask(taskData)
