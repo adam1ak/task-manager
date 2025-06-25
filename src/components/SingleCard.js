@@ -9,7 +9,7 @@ function SingleCard({ task }) {
     return (
         <div className="
             flex flex-col flex-grow justify-between
-            min-w-64 max-w-80 h-64 
+            w-full max-w-72 h-64 
             py-6 px-4
             nunito-sans
             bg-[#323232]

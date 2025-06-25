@@ -12,6 +12,7 @@ import { useTasks } from "../TaskContext";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import { PropagateLoader } from 'react-spinners';
+
 import 'react-toastify/dist/ReactToastify.css';
 import '../styles/Toast.css'
 

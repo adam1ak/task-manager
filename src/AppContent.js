@@ -4,6 +4,7 @@ import { useTasks } from "./TaskContext";
 import { IoMenu } from "react-icons/io5";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { PropagateLoader } from 'react-spinners';
+
 import AllTasks from "./pages/AllTasks";
 import ImportantTasks from "./pages/ImportantTasks";
 import CompletedTasks from "./pages/CompletedTasks";
